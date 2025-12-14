@@ -3,7 +3,9 @@ using Microsoft.EntityFrameworkCore;
 
 namespace Labs.UI.Data
 {
-    public class ApplicationDbContext(DbContextOptions<ApplicationDbContext> options) : IdentityDbContext(options)
+    public class ApplicationDbContext(DbContextOptions<ApplicationDbContext> options) 
+        : IdentityDbContext<AppUser>(options)
     {
+
     }
 }

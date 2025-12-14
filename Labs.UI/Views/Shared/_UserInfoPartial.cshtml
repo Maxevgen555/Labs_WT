@@ -1,44 +1,59 @@
-﻿@{
-    var controller = ViewContext.RouteData.Values["controller"]?
-        .ToString()?
-        .ToLower()
-        ?? String.Empty;
-    var area = ViewContext.RouteData.Values["area"]?
-        .ToString()?
-        .ToLower()
-        ?? String.Empty;
+﻿@using Microsoft.AspNetCore.Identity
+@inject SignInManager<AppUser> SignInManager
+@inject UserManager<AppUser> UserManager
+
+@if (User.Identity.IsAuthenticated)
+
+{
+    <!-- Информация пользователя -->
+    @await Component.InvokeAsync("Cart")
+
+    <div class="dropdown ms-4 nav-color">
+        <button class="btn btn-secondary dropdown-toggle"
+                type="button" id="dropdownMenuButton"
+                data-bs-toggle="dropdown"
+                aria-expanded="false">
+              @User.Identity.Name           
+            <img src="images/default-profile-picture.png" width="30"
+                 alt="User" class="rounded nav-color" />
+        </button>
+        <ul class="dropdown-menu" aria-labelledby="dropdownMenuButton">
+            <li>
+                <span class="dropdown-item-text">
+                    <img src="images/default-profile-picture.png"
+                         width="50" alt="User" class="rounded" />
+                    @User.Identity.Name            
+                </span>
+            </li>
+            <li><hr class="dropdown-divider"></li>
+            <li>
+                <form id="logoutForm" class="form-inline" asp-area="identity"
+                  asp-page="/account/logout" 
+                      asp-route-returnUrl="@Url.Action("Index", "Home", new { area = "" })">
+                    <button id="logout" type="submit" class="nav-link btn
+                                    btn-link text-dark">
+                        Logout
+                    </button>
+                </form>
+            </li>
+        </ul>
+    </div>
 }
+else
+{
+    <div class="navbar-nav ms-auto d-flex flex-column" style="min-width: 80px;">
+        <a asp-area="Identity"
+           asp-page="/Account/Register"
+           class="nav-link text-light py-0 px-2 text-nowrap">
+            Register
+        </a>
+        <a asp-area="Identity"
+           asp-page="/Account/Login"
+           class="nav-link text-light py-0 px-2 text-nowrap">
+            Login
+        </a>
+    </div>
+}
+    <!-- Информация пользователя - конец -->
 
-<!-- Информация пользователя -->
-@await Component.InvokeAsync("Cart")
 
-<div class="dropdown ms-4 nav-color">
-    <button class="btn btn-secondary dropdown-toggle"
-            type="button" id="dropdownMenuButton"
-            data-bs-toggle="dropdown"
-            aria-expanded="false">
-        User@gmail.com
-        <img src="images/default-profile-picture.png" width="30"
-             alt="User" class="rounded nav-color" />
-    </button>
-    <ul class="dropdown-menu" aria-labelledby="dropdownMenuButton">
-        <li>
-            <span class="dropdown-item-text">
-                <img src="images/default-profile-picture.png"
-                     width="50" alt="User" class="rounded" />
-                user@gmail.com
-            </span>
-        </li>
-        <li><hr class="dropdown-divider"></li>
-        <li>
-            <form id="logoutForm" class="form-inline @(area == "indentity" ? "active" : "")" asp-area="indentity"
-                  asp-page="/account/login">
-                <button id="logout" type="submit" class="nav-link btn
-                                btn-link text-dark">
-                    Logout
-                </button>
-            </form>
-        </li>
-    </ul>
-</div>
-<!-- Информация пользователя - конец -->

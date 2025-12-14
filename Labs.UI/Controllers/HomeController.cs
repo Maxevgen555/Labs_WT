@@ -19,7 +19,7 @@ namespace Labs.UI.Controllers
         }
         public IActionResult Index()
         {
-            ViewData["text"] = "Лабораторная работа №2";
+            ViewData["text"] = "Лабораторная работа №3";
             SelectList data = new SelectList(_listData, "Id", "Name");
             return View(data);
         }
@@ -27,6 +27,6 @@ namespace Labs.UI.Controllers
     public class ListDemo
     {
         public int Id { get; set; }
-        public string Name { get; set; }
+        public string? Name { get; set; }
     }
 }
