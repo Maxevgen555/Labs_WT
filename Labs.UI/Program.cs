@@ -4,14 +4,15 @@ using Labs.UI.Services.Contracts;
 using Microsoft.AspNetCore.Http.Features;
 using Microsoft.AspNetCore.Identity;
 using Microsoft.AspNetCore.Identity.UI.Services;
-using Microsoft.AspNetCore.Mvc.Routing;
 using Microsoft.EntityFrameworkCore;
 using System.Security.Claims;
 
 var builder = WebApplication.CreateBuilder(args);
 
 // Add services to the container.
-var connectionString = builder.Configuration.GetConnectionString("DefaultConnection") ?? throw new InvalidOperationException("Connection string 'DefaultConnection' not found.");
+var connectionString = builder.Configuration.GetConnectionString("DefaultConnection")
+    ?? throw new InvalidOperationException("Connection string 'DefaultConnection' not found.");
+
 builder.Services.AddDbContext<ApplicationDbContext>(options =>
     options.UseSqlServer(connectionString));
 builder.Services.AddDatabaseDeveloperPageExceptionFilter();
@@ -26,31 +27,27 @@ builder.Services.AddDefaultIdentity<AppUser>(options =>
 })
 .AddEntityFrameworkStores<ApplicationDbContext>();
 
-// Регистрация сервисов
-builder.Services.Configure<FormOptions>(options =>
+// Регистрация API сервисов
+builder.Services.AddHttpClient<ICategoryService, ApiCategoryService>(client =>
 {
-    options.MultipartBodyLengthLimit = 10485760; // 10MB limit
+    client.BaseAddress = new Uri("https://localhost:7002/api/categories/");
 });
 
-builder.Services.Configure<IISServerOptions>(options =>
+builder.Services.AddHttpClient<IProductService, ApiProductService>(client =>
 {
-    options.MaxRequestBodySize = 10485760;
+    client.BaseAddress = new Uri("https://localhost:7002/api/dishes/");
 });
-
-builder.Services.AddScoped<ICategoryService, MemoryCategoryService>();
-builder.Services.AddScoped<IProductService, MemoryProductService>();
 
 // Для тэг-хелперов
 builder.Services.AddHttpContextAccessor();
-builder.Services.AddSingleton<IUrlHelperFactory, UrlHelperFactory>();
 
 builder.Services.AddAuthorization(opt =>
 {
     opt.AddPolicy("admin", p =>
-    p.RequireClaim(ClaimTypes.Role, "admin"));
+        p.RequireClaim(ClaimTypes.Role, "admin"));
 });
-builder.Services.AddSingleton<IEmailSender, NoOpEmailSender>();
 
+builder.Services.AddSingleton<IEmailSender, NoOpEmailSender>();
 builder.Services.AddControllersWithViews();
 
 var app = builder.Build();
@@ -63,15 +60,12 @@ if (app.Environment.IsDevelopment())
 else
 {
     app.UseExceptionHandler("/Home/Error");
-    // The default HSTS value is 30 days. You may want to change this for production scenarios, see https://aka.ms/aspnetcore-hsts.
     app.UseHsts();
 }
 
 app.UseHttpsRedirection();
 app.UseStaticFiles();
-
 app.UseRouting();
-
 app.UseAuthentication();
 app.UseAuthorization();
 
@@ -92,5 +86,24 @@ app.MapControllerRoute(
 app.MapRazorPages();
 
 await DbInit.SetupIdentityAdmin(app);
+
+app.UseStaticFiles();
+
+// обработка /Catalog как SPA маршрута:
+app.MapWhen(context => context.Request.Path.StartsWithSegments("/Catalog"),
+    appBuilder =>
+    {
+        appBuilder.Use((context, next) =>
+        {
+            context.Request.Path = "/";
+            return next();
+        });
+        appBuilder.UseStaticFiles();
+        appBuilder.UseRouting();
+        appBuilder.UseEndpoints(endpoints =>
+        {
+            endpoints.MapFallbackToFile("/Catalog/{*path}", "index.html");
+        });
+    });
 
 app.Run();

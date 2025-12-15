@@ -5,8 +5,8 @@ using Microsoft.AspNetCore.Routing;
 
 namespace Labs.UI.Controllers
 {
-    [Route("Catalog")]
-    [Route("Catalog/{category?}")]
+    //[Route("Catalog")]
+    //[Route("Catalog/{category?}")]
     public class ProductController : Controller
     {
         private readonly IProductService _productService;
