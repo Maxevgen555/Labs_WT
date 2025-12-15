@@ -4,6 +4,7 @@ using Labs.UI.Services.Contracts;
 using Microsoft.AspNetCore.Http.Features;
 using Microsoft.AspNetCore.Identity;
 using Microsoft.AspNetCore.Identity.UI.Services;
+using Microsoft.AspNetCore.Mvc.Routing;
 using Microsoft.EntityFrameworkCore;
 using System.Security.Claims;
 
@@ -17,7 +18,7 @@ builder.Services.AddDatabaseDeveloperPageExceptionFilter();
 
 builder.Services.AddDefaultIdentity<AppUser>(options =>
 {
-    options.SignIn.RequireConfirmedAccount = true;
+    options.SignIn.RequireConfirmedAccount = false;
     options.Password.RequireDigit = false;
     options.Password.RequireNonAlphanumeric = false;
     options.Password.RequireLowercase = false;
@@ -38,6 +39,10 @@ builder.Services.Configure<IISServerOptions>(options =>
 
 builder.Services.AddScoped<ICategoryService, MemoryCategoryService>();
 builder.Services.AddScoped<IProductService, MemoryProductService>();
+
+// Для тэг-хелперов
+builder.Services.AddHttpContextAccessor();
+builder.Services.AddSingleton<IUrlHelperFactory, UrlHelperFactory>();
 
 builder.Services.AddAuthorization(opt =>
 {
@@ -63,24 +68,28 @@ else
 }
 
 app.UseHttpsRedirection();
+app.UseStaticFiles();
+
 app.UseRouting();
+
 app.UseAuthentication();
 app.UseAuthorization();
 
-app.MapStaticAssets();
-
 app.MapControllerRoute(
     name: "default",
-    pattern: "{controller=Home}/{action=Index}/{id?}")
-    .WithStaticAssets();
+    pattern: "{controller=Home}/{action=Index}/{id?}");
+
+app.MapControllerRoute(
+    name: "catalog",
+    pattern: "Catalog/{category?}/{pageNo?}",
+    defaults: new { controller = "Product", action = "Index" });
 
 app.MapControllerRoute(
     name: "image",
     pattern: "image/{action=GetAvatar}",
     defaults: new { controller = "Image" });
 
-app.MapRazorPages()
-   .WithStaticAssets();
+app.MapRazorPages();
 
 await DbInit.SetupIdentityAdmin(app);
 

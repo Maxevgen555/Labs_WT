@@ -1,9 +1,12 @@
 ﻿using Microsoft.AspNetCore.Mvc;
 using Labs.UI.Services.Contracts;
 using Labs.Domain.Entities;
+using Microsoft.AspNetCore.Routing;
 
 namespace Labs.UI.Controllers
 {
+    [Route("Catalog")]
+    [Route("Catalog/{category?}")]
     public class ProductController : Controller
     {
         private readonly IProductService _productService;
@@ -15,7 +18,7 @@ namespace Labs.UI.Controllers
             _categoryService = categoryService;
         }
 
-        public async Task<IActionResult> Index(string? category)
+        public async Task<IActionResult> Index(string? category, int pageNo = 1)
         {
             // Получение списка категорий
             var categoriesResponse = await _categoryService.GetCategoryListAsync();
@@ -30,12 +33,12 @@ namespace Labs.UI.Controllers
             ViewData["Categories"] = categoriesResponse.Data;
             ViewData["CurrentCategory"] = currentCategory;
 
-            // Получение списка блюд
-            var productResponse = await _productService.GetProductListAsync(category);
+            // Получение списка блюд с пагинацией
+            var productResponse = await _productService.GetProductListAsync(category, pageNo);
             if (!productResponse.Success)
                 ViewData["Error"] = productResponse.ErrorMessage;
 
-            return View(productResponse.Data?.Items ?? new List<Dish>());
+            return View(productResponse.Data ?? new Domain.Models.ListModel<Dish>());
         }
     }
 }
