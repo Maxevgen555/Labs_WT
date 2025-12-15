@@ -1,3 +1,4 @@
 <Solution>
+  <Project Path="Labs.Domain/Labs.Domain.csproj" Id="fd4d5b40-bc70-491c-b15a-5eadddff562c" />
   <Project Path="Labs.UI/Labs.UI.csproj" />
 </Solution>

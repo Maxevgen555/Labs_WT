@@ -2,6 +2,16 @@
 // The .NET Foundation licenses this file to you under the MIT license.
 #nullable disable
 
+using Labs.UI.Data;
+using Microsoft.AspNetCore.Authentication;
+using Microsoft.AspNetCore.Authorization;
+using Microsoft.AspNetCore.Identity;
+using Microsoft.AspNetCore.Identity.UI.Services;
+using Microsoft.AspNetCore.Mvc;
+using Microsoft.AspNetCore.Mvc.RazorPages;
+using Microsoft.AspNetCore.StaticFiles;
+using Microsoft.AspNetCore.WebUtilities;
+using Microsoft.Extensions.Logging;
 using System;
 using System.Collections.Generic;
 using System.ComponentModel.DataAnnotations;
@@ -10,15 +20,6 @@ using System.Text;
 using System.Text.Encodings.Web;
 using System.Threading;
 using System.Threading.Tasks;
-using Microsoft.AspNetCore.Authentication;
-using Microsoft.AspNetCore.Authorization;
-using Labs.UI.Data;
-using Microsoft.AspNetCore.Identity;
-using Microsoft.AspNetCore.Identity.UI.Services;
-using Microsoft.AspNetCore.Mvc;
-using Microsoft.AspNetCore.Mvc.RazorPages;
-using Microsoft.AspNetCore.WebUtilities;
-using Microsoft.Extensions.Logging;
 
 namespace Labs.UI.Areas.Identity.Pages.Account
 {
@@ -52,6 +53,7 @@ namespace Labs.UI.Areas.Identity.Pages.Account
         /// </summary>
         [BindProperty]
         public InputModel Input { get; set; }
+        //public IFormFile? Avatar { get; set; }
 
         /// <summary>
         ///     This API supports the ASP.NET Core Identity default UI infrastructure and is not intended to be used
@@ -98,6 +100,13 @@ namespace Labs.UI.Areas.Identity.Pages.Account
             [Display(Name = "Confirm password")]
             [Compare("Password", ErrorMessage = "The password and confirmation password do not match.")]
             public string ConfirmPassword { get; set; }
+
+            /// <summary>
+            ///     Avatar image file
+            /// </summary>
+            [DataType(DataType.Upload)]
+            [Display(Name = "Avatar")]
+            public IFormFile Avatar { get; set; }
         }
 
 
@@ -117,7 +126,48 @@ namespace Labs.UI.Areas.Identity.Pages.Account
 
                 await _userStore.SetUserNameAsync(user, Input.Email, CancellationToken.None);
                 await _emailStore.SetEmailAsync(user, Input.Email, CancellationToken.None);
+
+                // Сохранение аватара
+                if (Input.Avatar != null && Input.Avatar.Length > 0)
+                {
+                    using var stream = new MemoryStream();
+                    await Input.Avatar.CopyToAsync(stream);
+                    user.Avatar = stream.ToArray();
+
+                    // Определение MIME-типа
+                    var extProvider = new FileExtensionContentTypeProvider();
+                    var ext = Path.GetExtension(Input.Avatar.FileName);
+                    if (extProvider.Mappings.TryGetValue(ext.ToLower(), out var mimeType))
+                    {
+                        user.MimeType = mimeType;
+                    }
+                    else
+                    {
+                        user.MimeType = "image/png"; // значение по умолчанию
+                    }
+                }
+
+                if (Input.Avatar != null)
+                {
+                    _logger.LogInformation($"Avatar uploaded: {Input.Avatar.FileName}, Size: {Input.Avatar.Length} bytes");
+                }
+                else
+                {
+                    _logger.LogInformation("No avatar uploaded");
+                }
+
+                if (user.Avatar != null)
+                {
+                    _logger.LogInformation($"Avatar saved to user: {user.Avatar.Length} bytes, MimeType: {user.MimeType}");
+                }
+                else
+                {
+                    _logger.LogInformation("User avatar is null");
+                }
+
                 var result = await _userManager.CreateAsync(user, Input.Password);
+
+
 
                 if (result.Succeeded)
                 {

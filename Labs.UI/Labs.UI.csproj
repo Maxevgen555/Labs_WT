@@ -21,4 +21,8 @@
     <Folder Include="wwwroot\images\" />
   </ItemGroup>
 
+  <ItemGroup>
+    <ProjectReference Include="..\Labs.Domain\Labs.Domain.csproj" />
+  </ItemGroup>
+
 </Project>

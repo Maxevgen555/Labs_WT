@@ -1,4 +1,7 @@
 using Labs.UI.Data;
+using Labs.UI.Services;
+using Labs.UI.Services.Contracts;
+using Microsoft.AspNetCore.Http.Features;
 using Microsoft.AspNetCore.Identity;
 using Microsoft.AspNetCore.Identity.UI.Services;
 using Microsoft.EntityFrameworkCore;
@@ -20,14 +23,30 @@ builder.Services.AddDefaultIdentity<AppUser>(options =>
     options.Password.RequireLowercase = false;
     options.Password.RequireUppercase = false;
 })
+.AddEntityFrameworkStores<ApplicationDbContext>();
 
-    .AddEntityFrameworkStores<ApplicationDbContext>();
+// Регистрация сервисов
+builder.Services.Configure<FormOptions>(options =>
+{
+    options.MultipartBodyLengthLimit = 10485760; // 10MB limit
+});
+
+builder.Services.Configure<IISServerOptions>(options =>
+{
+    options.MaxRequestBodySize = 10485760;
+});
+
+builder.Services.AddScoped<ICategoryService, MemoryCategoryService>();
+builder.Services.AddScoped<IProductService, MemoryProductService>();
+
 builder.Services.AddAuthorization(opt =>
 {
     opt.AddPolicy("admin", p =>
     p.RequireClaim(ClaimTypes.Role, "admin"));
 });
 builder.Services.AddSingleton<IEmailSender, NoOpEmailSender>();
+
+builder.Services.AddControllersWithViews();
 
 var app = builder.Build();
 
@@ -54,6 +73,11 @@ app.MapControllerRoute(
     name: "default",
     pattern: "{controller=Home}/{action=Index}/{id?}")
     .WithStaticAssets();
+
+app.MapControllerRoute(
+    name: "image",
+    pattern: "image/{action=GetAvatar}",
+    defaults: new { controller = "Image" });
 
 app.MapRazorPages()
    .WithStaticAssets();
