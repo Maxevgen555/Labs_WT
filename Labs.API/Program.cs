@@ -44,7 +44,7 @@ if (app.Environment.IsDevelopment())
 }
 
 app.UseHttpsRedirection();
-app.UseStaticFiles(); // Для обслуживания файлов из wwwroot/images
+app.UseStaticFiles(); // Для обслуживания файлов из wwwroot / images
 app.UseCors("AllowAll");
 app.UseAuthorization();
 app.MapControllers();
