@@ -5,6 +5,8 @@ using Microsoft.AspNetCore.Routing;
 
 namespace Labs.UI.Controllers
 {
+    //[Route("Catalog")]
+    //[Route("Catalog/{category?}")]
     public class ProductController : Controller
     {
         private readonly IProductService _productService;
@@ -18,45 +20,25 @@ namespace Labs.UI.Controllers
 
         public async Task<IActionResult> Index(string? category, int pageNo = 1)
         {
-            try
-            {
-                // Получение списка категорий
-                var categoriesResponse = await _categoryService.GetCategoryListAsync();
-                if (categoriesResponse.Success)
-                {
-                    ViewData["Categories"] = categoriesResponse.Data;
-                }
-                else
-                {
-                    ViewData["Categories"] = new List<Category>();
-                    ViewData["CategoriesError"] = categoriesResponse.ErrorMessage;
-                }
+            // Получение списка категорий
+            var categoriesResponse = await _categoryService.GetCategoryListAsync();
+            if (!categoriesResponse.Success)
+                return NotFound(categoriesResponse.ErrorMessage);
 
-                // Определение текущей категории
-                var currentCategory = category == null
-                    ? "Все"
-                    : (categoriesResponse.Data?.FirstOrDefault(c => c.NormalizedName == category)?.Name ?? "Все");
+            // Определение текущей категории
+            var currentCategory = category == null
+                ? "Все"
+                : categoriesResponse.Data?.FirstOrDefault(c => c.NormalizedName == category)?.Name ?? "Все";
 
-                ViewData["CurrentCategory"] = currentCategory;
+            ViewData["Categories"] = categoriesResponse.Data;
+            ViewData["CurrentCategory"] = currentCategory;
 
-                // Получение списка блюд с пагинацией
-                var productResponse = await _productService.GetProductListAsync(category, pageNo);
+            // Получение списка блюд с пагинацией
+            var productResponse = await _productService.GetProductListAsync(category, pageNo);
+            if (!productResponse.Success)
+                ViewData["Error"] = productResponse.ErrorMessage;
 
-                if (productResponse.Success)
-                {
-                    return View(productResponse.Data ?? new Domain.Models.ListModel<Dish>());
-                }
-                else
-                {
-                    ViewData["Error"] = productResponse.ErrorMessage;
-                    return View(new Domain.Models.ListModel<Dish>());
-                }
-            }
-            catch (Exception ex)
-            {
-                ViewData["Error"] = $"Ошибка: {ex.Message}";
-                return View(new Domain.Models.ListModel<Dish>());
-            }
+            return View(productResponse.Data ?? new Domain.Models.ListModel<Dish>());
         }
     }
 }

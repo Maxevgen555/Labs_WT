@@ -12,6 +12,7 @@ builder.Services.AddControllers()
         options.JsonSerializerOptions.DefaultIgnoreCondition = JsonIgnoreCondition.WhenWritingNull;
     });
 
+// Learn more about configuring Swagger/OpenAPI at https://aka.ms/aspnetcore/swashbuckle
 builder.Services.AddEndpointsApiExplorer();
 builder.Services.AddSwaggerGen();
 
@@ -43,27 +44,12 @@ if (app.Environment.IsDevelopment())
 }
 
 app.UseHttpsRedirection();
-
-// Статические файлы
-app.UseStaticFiles();
-
-app.UseRouting();
+app.UseStaticFiles(); // Для обслуживания файлов из wwwroot/images
 app.UseCors("AllowAll");
 app.UseAuthorization();
-
 app.MapControllers();
 
-try
-{
-    // Инициализация базы данных
-    await DbInitializer.SeedData(app);
-    Console.WriteLine("API запущен успешно!");
-    Console.WriteLine($"Swagger: {app.Urls.FirstOrDefault()}/swagger");
-    Console.WriteLine($"API Endpoints: {app.Urls.FirstOrDefault()}/api/dishes");
-}
-catch (Exception ex)
-{
-    Console.WriteLine($"Ошибка при запуске API: {ex.Message}");
-}
+// Initialize database
+await DbInitializer.SeedData(app);
 
 app.Run();

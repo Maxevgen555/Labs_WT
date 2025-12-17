@@ -21,8 +21,7 @@ namespace Labs.API.Data
                     return;
                 }
 
-                // Используем хост приложения для формирования URL
-                var host = "https://localhost:7002"; // или "http://localhost:5002" если используете HTTP
+                var apiUrl = "https://localhost:7002";
 
                 // Создаем категории
                 var categories = new List<Category>
@@ -38,7 +37,7 @@ namespace Labs.API.Data
                 await context.Categories.AddRangeAsync(categories);
                 await context.SaveChangesAsync();
 
-                // Создаем блюда с полными URL к изображениям
+                // Создаем блюда
                 var dishes = new List<Dish>
                 {
                     new Dish
@@ -46,56 +45,56 @@ namespace Labs.API.Data
                         Name = "Суп-харчо",
                         Description = "Очень острый, невкусный",
                         Calories = 200,
-                        Image = $"{host}/images/soup.jpg",
-                        CategoryId = categories.First(c => c.NormalizedName == "soups").Id
+                        Image = $"{apiUrl}/images/soup.jpg",
+                        Category = categories.FirstOrDefault(c => c.NormalizedName == "soups")
                     },
                     new Dish
                     {
                         Name = "Борщ",
                         Description = "Много сала, без сметаны",
                         Calories = 330,
-                        Image = $"{host}/images/borshch.jpg",
-                        CategoryId = categories.First(c => c.NormalizedName == "soups").Id
+                        Image = $"{apiUrl}/images/borshch.jpg",
+                        Category = categories.FirstOrDefault(c => c.NormalizedName == "soups")
                     },
                     new Dish
                     {
                         Name = "Цезарь",
                         Description = "С курицей и пармезаном",
                         Calories = 450,
-                        Image = $"{host}/images/salad.jpg",
-                        CategoryId = categories.First(c => c.NormalizedName == "salads").Id
+                        Image = $"{apiUrl}/images/salad.jpg",
+                        Category = categories.FirstOrDefault(c => c.NormalizedName == "salads")
                     },
                     new Dish
                     {
                         Name = "Стейк",
                         Description = "Мраморная говядина",
                         Calories = 800,
-                        Image = $"{host}/images/steak.jpg",
-                        CategoryId = categories.First(c => c.NormalizedName == "main").Id
+                        Image = $"{apiUrl}/images/steak.jpg",
+                        Category = categories.FirstOrDefault(c => c.NormalizedName == "main")
                     },
                     new Dish
                     {
                         Name = "Греческий салат",
                         Description = "С фетой и оливками",
                         Calories = 350,
-                        Image = $"{host}/images/salad2.jpg",
-                        CategoryId = categories.First(c => c.NormalizedName == "salads").Id
+                        Image = $"{apiUrl}/images/salad2.jpg",
+                        Category = categories.FirstOrDefault(c => c.NormalizedName == "salads")
                     },
                     new Dish
                     {
                         Name = "Куриный суп",
                         Description = "Домашний, с лапшой",
                         Calories = 280,
-                        Image = $"{host}/images/soup2.jpg",
-                        CategoryId = categories.First(c => c.NormalizedName == "soups").Id
+                        Image = $"{apiUrl}/images/soup2.jpg",
+                        Category = categories.FirstOrDefault(c => c.NormalizedName == "soups")
                     },
                     new Dish
                     {
                         Name = "Лазанья",
                         Description = "Итальянская классика",
                         Calories = 650,
-                        Image = $"{host}/images/main2.jpg",
-                        CategoryId = categories.First(c => c.NormalizedName == "main").Id
+                        Image = $"{apiUrl}/images/main2.jpg",
+                        Category = categories.FirstOrDefault(c => c.NormalizedName == "main")
                     }
                 };
 

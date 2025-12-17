@@ -1,12 +1,12 @@
-﻿@{
-    var controller = ViewContext.RouteData.Values["controller"]?
-        .ToString()?
-        .ToLower()
-        ?? String.Empty;
-    var area = ViewContext.RouteData.Values["area"]?
-        .ToString()?
-        .ToLower()
-        ?? String.Empty;
+﻿﻿@{
+var controller = ViewContext.RouteData.Values["controller"]?
+    .ToString()?
+    .ToLower()
+    ?? String.Empty;
+var area = ViewContext.RouteData.Values["area"]?
+    .ToString()?
+    .ToLower()
+    ?? String.Empty;
 }
 
 <!-- меню сайта -->
@@ -17,6 +17,6 @@
     <a class="nav-item nav-link @(controller == "product" ? "active" : "")"
        asp-controller="Product" asp-action="Index">Каталог</a>
     <a class="nav-item nav-link @(area == "admin" ? "active" : "")"
-       asp-area="Admin" asp-page="/Dishes/Index">Администрирование</a>
+       asp-area="admin" asp-page="/index">Администрирование</a>
 </div>
 <!-- меню сайта - конец -->
