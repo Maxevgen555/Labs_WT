@@ -2,10 +2,10 @@
 
 #nullable disable
 
-namespace Labs.API.Migrations
+namespace Labs.API.Data.Migrations
 {
     /// <inheritdoc />
-    public partial class LabsAPI2 : Migration
+    public partial class InitialCreate : Migration
     {
         /// <inheritdoc />
         protected override void Up(MigrationBuilder migrationBuilder)

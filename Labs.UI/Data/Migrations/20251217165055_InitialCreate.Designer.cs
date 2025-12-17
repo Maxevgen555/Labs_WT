@@ -9,11 +9,11 @@ using Microsoft.EntityFrameworkCore.Storage.ValueConversion;
 
 #nullable disable
 
-namespace Labs.UI.Migrations
+namespace Labs.UI.Data.Migrations
 {
     [DbContext(typeof(ApplicationDbContext))]
-    [Migration("20251215214530_LabsAPI")]
-    partial class LabsAPI
+    [Migration("20251217165055_InitialCreate")]
+    partial class InitialCreate
     {
         /// <inheritdoc />
         protected override void BuildTargetModel(ModelBuilder modelBuilder)

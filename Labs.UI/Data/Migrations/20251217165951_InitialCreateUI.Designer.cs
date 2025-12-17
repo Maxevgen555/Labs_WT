@@ -9,11 +9,11 @@ using Microsoft.EntityFrameworkCore.Storage.ValueConversion;
 
 #nullable disable
 
-namespace Labs.UI.Migrations
+namespace Labs.UI.Data.Migrations
 {
     [DbContext(typeof(ApplicationDbContext))]
-    [Migration("20251214123928_Init")]
-    partial class Init
+    [Migration("20251217165951_InitialCreateUI")]
+    partial class InitialCreateUI
     {
         /// <inheritdoc />
         protected override void BuildTargetModel(ModelBuilder modelBuilder)
@@ -33,6 +33,9 @@ namespace Labs.UI.Migrations
                     b.Property<int>("AccessFailedCount")
                         .HasColumnType("int");
 
+                    b.Property<byte[]>("Avatar")
+                        .HasColumnType("varbinary(max)");
+
                     b.Property<string>("ConcurrencyStamp")
                         .IsConcurrencyToken()
                         .HasColumnType("nvarchar(max)");
@@ -49,6 +52,10 @@ namespace Labs.UI.Migrations
 
                     b.Property<DateTimeOffset?>("LockoutEnd")
                         .HasColumnType("datetimeoffset");
+
+                    b.Property<string>("MimeType")
+                        .IsRequired()
+                        .HasColumnType("nvarchar(max)");
 
                     b.Property<string>("NormalizedEmail")
                         .HasMaxLength(256)

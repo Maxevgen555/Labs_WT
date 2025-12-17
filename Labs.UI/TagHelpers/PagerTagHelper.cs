@@ -22,46 +22,22 @@ namespace Labs.UI.TagHelpers
         [HtmlAttributeNotBound]
         public ViewContext ViewContext { get; set; } = null!;
 
-        /// <summary>
-        /// Номер текущей страницы
-        /// </summary>
         [HtmlAttributeName("current-page")]
         public int CurrentPage { get; set; }
 
-        /// <summary>
-        /// Общее количество страниц
-        /// </summary>
         [HtmlAttributeName("total-pages")]
         public int TotalPages { get; set; }
 
-        /// <summary>
-        /// Имя категории объектов
-        /// </summary>
         public string? Category { get; set; }
 
-        /// <summary>
-        /// Признак страниц администратора
-        /// </summary>
         public bool Admin { get; set; } = false;
 
-        /// <summary>
-        /// Имя контроллера
-        /// </summary>
         public string Controller { get; set; } = "Product";
 
-        /// <summary>
-        /// Имя действия
-        /// </summary>
         public string Action { get; set; } = "Index";
 
-        /// <summary>
-        /// Номер предыдущей страницы
-        /// </summary>
         private int PrevPage => CurrentPage == 1 ? 1 : CurrentPage - 1;
 
-        /// <summary>
-        /// Номер следующей страницы
-        /// </summary>
         private int NextPage => CurrentPage == TotalPages ? TotalPages : CurrentPage + 1;
 
         public override void Process(TagHelperContext context, TagHelperOutput output)
@@ -110,12 +86,22 @@ namespace Labs.UI.TagHelpers
             a.AddCssClass("page-link");
 
             var urlHelper = _urlHelperFactory.GetUrlHelper(ViewContext);
-            var routeValues = new { category = category, pageNo = pageNo };
-            var url = urlHelper.Action(Action, Controller, routeValues);
 
-            a.Attributes.Add("href", url);
+            if (Admin)
+            {
+                // Для административной панели используем другой маршрут
+                var routeValues = new { area = "Admin", pageNo = pageNo };
+                var url = urlHelper.Page("/Dishes/Index", routeValues);
+                a.Attributes.Add("href", url);
+            }
+            else
+            {
+                var routeValues = new { category = category, pageNo = pageNo };
+                var url = urlHelper.Action(Action, Controller, routeValues);
+                a.Attributes.Add("href", url);
+            }
+
             a.InnerHtml.AppendHtml(innerText);
-
             li.InnerHtml.AppendHtml(a);
             return li;
         }
