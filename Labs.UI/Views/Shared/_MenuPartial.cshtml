@@ -13,10 +13,12 @@ var area = ViewContext.RouteData.Values["area"]?
 <a class="navbar-brand" asp-controller="home" asp-action="index">Labs</a>
 <div class="navbar-nav">
     <a class="nav-item nav-link @(controller == "home" ? "active" : "")"
-       asp-controller="home" asp-action="index">Лаб 3</a>
+       asp-controller="home" asp-action="index">Лаб 8</a>
     <a class="nav-item nav-link @(controller == "product" ? "active" : "")"
        asp-controller="Product" asp-action="Index">Каталог</a>
-    <a class="nav-item nav-link @(area == "admin" ? "active" : "")"
-       asp-area="admin" asp-page="/index">Администрирование</a>
-</div>
-<!-- меню сайта - конец -->
+    @if (User.IsInRole("admin"))
+    {
+        <a class="nav-item nav-link @(area == "admin" ? "active" : "")"
+           asp-area="Admin" asp-page="/Dishes/Index">Администрирование</a>
+    }
+    <!-- меню сайта - конец -->

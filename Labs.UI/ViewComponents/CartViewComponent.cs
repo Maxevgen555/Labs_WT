@@ -1,4 +1,7 @@
-﻿using Microsoft.AspNetCore.Mvc;
+﻿// Labs.UI/ViewComponents/CartViewComponent.cs
+using Labs.Domain.Models;
+using Labs.UI.Extensions;
+using Microsoft.AspNetCore.Mvc;
 
 namespace Labs.UI.ViewComponents
 {
@@ -6,7 +9,8 @@ namespace Labs.UI.ViewComponents
     {
         public IViewComponentResult Invoke()
         {
-            return View();
+            var cart = HttpContext.Session.Get<Cart>("cart") ?? new Cart();
+            return View(cart);
         }
     }
 }

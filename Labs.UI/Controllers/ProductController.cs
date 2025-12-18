@@ -33,8 +33,8 @@ namespace Labs.UI.Controllers
             ViewData["Categories"] = categoriesResponse.Data;
             ViewData["CurrentCategory"] = currentCategory;
 
-            // Получение списка блюд с пагинацией
-            var productResponse = await _productService.GetProductListAsync(category, pageNo);
+            // Получение списка блюд с пагинацией - теперь передаем pageSize = 3 (по умолчанию)
+            var productResponse = await _productService.GetProductListAsync(category, pageNo, 3);
             if (!productResponse.Success)
                 ViewData["Error"] = productResponse.ErrorMessage;
 

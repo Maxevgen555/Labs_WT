@@ -1,0 +1,81 @@
+﻿@using Labs.Domain.Models
+@model System.Collections.Generic.Dictionary<int, CartItem>
+
+@{
+    ViewData["Title"] = "Корзина";
+}
+
+<!-- список объектов -->
+@if (TempData["SuccessMessage"] != null)
+{
+    <div class="alert alert-success">@TempData["SuccessMessage"]</div>
+}
+
+@if (TempData["ErrorMessage"] != null)
+{
+    <div class="alert alert-danger">@TempData["ErrorMessage"]</div>
+}
+
+@if (Model.Count == 0)
+{
+    <h2 class="m-2">Корзина пуста</h2>
+}
+else
+{
+    <h2 class="m-2">Ваша корзина:</h2>
+
+    <div class="mb-3">
+        <a class="btn btn-warning" asp-action="Clear" asp-controller="Cart">
+            Очистить корзину
+        </a>
+    </div>
+
+    <table class="table table-striped">
+        <thead>
+            <tr>
+                <th>Изображение</th>
+                <th>Название</th>
+                <th>Описание</th>
+                <th>Количество</th>
+                <th>Калории (на шт.)</th>
+                <th>Всего калорий</th>
+                <th>Действия</th>
+            </tr>
+        </thead>
+        <tbody>
+            @foreach (var item in Model)
+            {
+                <tr>
+                    <td><img src="@item.Value.Item.Image" width="200" /></td>
+                    <td>@item.Value.Item.Name</td>
+                    <td>@item.Value.Item.Description</td>
+                    <td>
+                        <form asp-action="Update" asp-controller="Cart"
+                              asp-route-id="@item.Value.Item.Id" method="post" class="form-inline">
+                            <input type="number" name="qty" value="@item.Value.Qty"
+                                   min="1" max="10" class="form-control form-control-sm" style="width: 70px;" />
+                            <button type="submit" class="btn btn-sm btn-primary ml-1">Обновить</button>
+                        </form>
+                    </td>
+                    <td>@item.Value.Item.Calories</td>
+                    <td>@(item.Value.Item.Calories* item.Value.Qty)</td>
+                    <td>
+                        <a class="btn btn-danger btn-sm"
+                           asp-action="Remove"
+                           asp-controller="cart"
+                           asp-route-id="@item.Value.Item.Id">
+                            <i class="fas fa-trash"></i> Удалить
+                        </a>
+                    </td>
+                </tr>
+            }
+        </tbody>
+        <tfoot>
+            <tr>
+                <td colspan="5" class="text-right"><strong>Итого:</strong></td>
+                <td><strong>@ViewBag.TotalCalories калорий</strong></td>
+                <td></td>
+            </tr>
+        </tfoot>
+    </table>
+}

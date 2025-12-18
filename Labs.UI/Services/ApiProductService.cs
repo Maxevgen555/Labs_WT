@@ -17,11 +17,12 @@ namespace Labs.UI.Services
 
         public async Task<ResponseData<ListModel<Dish>>> GetProductListAsync(
             string? categoryNormalizedName,
-            int pageNo = 1)
+            int pageNo = 1,
+            int pageSize = 3)  // Добавляем параметр
         {
             try
             {
-                var queryString = $"?pageNo={pageNo}&pageSize=3";
+                var queryString = $"?pageNo={pageNo}&pageSize={pageSize}";  // Используем pageSize
 
                 if (!string.IsNullOrEmpty(categoryNormalizedName))
                 {
@@ -56,25 +57,101 @@ namespace Labs.UI.Services
                 };
             }
         }
-
-        public Task<ResponseData<Dish>> GetProductByIdAsync(int id)
+        public async Task<ResponseData<Dish>> GetProductByIdAsync(int id)
         {
-            throw new NotImplementedException();
+            try
+            {
+                var response = await _httpClient.GetAsync($"{id}");
+
+                if (response.IsSuccessStatusCode)
+                {
+                    var result = await response.Content
+                        .ReadFromJsonAsync<ResponseData<Dish>>();
+
+                    if (result != null)
+                    {
+                        return result;
+                    }
+                }
+
+                return new ResponseData<Dish>
+                {
+                    Success = false,
+                    ErrorMessage = "Ошибка при получении данных с API"
+                };
+            }
+            catch (Exception ex)
+            {
+                return new ResponseData<Dish>
+                {
+                    Success = false,
+                    ErrorMessage = $"Ошибка: {ex.Message}"
+                };
+            }
+        }
+        public async Task<ResponseData<Dish>> CreateProductAsync(Dish product, IFormFile? formFile)
+        {
+            try
+            {
+                // В реальном приложении нужно отправвать multipart/form-data с файлом
+                // Пока отправляем только JSON
+                var response = await _httpClient.PostAsJsonAsync("", product);
+
+                if (response.IsSuccessStatusCode)
+                {
+                    var result = await response.Content.ReadFromJsonAsync<ResponseData<Dish>>();
+                    if (result != null)
+                    {
+                        return result;
+                    }
+                }
+
+                return new ResponseData<Dish>
+                {
+                    Success = false,
+                    ErrorMessage = $"Ошибка при создании: {response.StatusCode}"
+                };
+            }
+            catch (Exception ex)
+            {
+                return new ResponseData<Dish>
+                {
+                    Success = false,
+                    ErrorMessage = $"Ошибка: {ex.Message}"
+                };
+            }
         }
 
-        public Task UpdateProductAsync(int id, Dish product, IFormFile? formFile)
+        public async Task UpdateProductAsync(int id, Dish product, IFormFile? formFile)
         {
-            throw new NotImplementedException();
+            try
+            {
+                var response = await _httpClient.PutAsJsonAsync($"{id}", product);
+                if (!response.IsSuccessStatusCode)
+                {
+                    throw new Exception($"Ошибка при обновлении: {response.StatusCode}");
+                }
+            }
+            catch (Exception ex)
+            {
+                throw new Exception($"Ошибка при обновлении: {ex.Message}");
+            }
         }
 
-        public Task DeleteProductAsync(int id)
+        public async Task DeleteProductAsync(int id)
         {
-            throw new NotImplementedException();
-        }
-
-        public Task<ResponseData<Dish>> CreateProductAsync(Dish product, IFormFile? formFile)
-        {
-            throw new NotImplementedException();
+            try
+            {
+                var response = await _httpClient.DeleteAsync($"{id}");
+                if (!response.IsSuccessStatusCode)
+                {
+                    throw new Exception($"Ошибка при удалении: {response.StatusCode}");
+                }
+            }
+            catch (Exception ex)
+            {
+                throw new Exception($"Ошибка при удалении: {ex.Message}");
+            }
         }
     }
 }

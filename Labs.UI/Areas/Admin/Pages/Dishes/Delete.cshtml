@@ -1,0 +1,62 @@
+﻿@page "{id:int}"
+@model Labs.UI.Areas.Admin.Pages.Dishes.DeleteModel
+@{
+    ViewData["Title"] = "Удалить блюдо";
+}
+
+<div class="container">
+    <div class="row">
+        <div class="col-md-8 offset-md-2">
+            <h2>Удалить блюдо</h2>
+            <hr />
+
+            <div class="alert alert-danger">
+                <h5 class="alert-heading">Внимание!</h5>
+                <p>Вы уверены, что хотите удалить это блюдо? Это действие нельзя отменить.</p>
+            </div>
+
+            <div class="card">
+                <div class="card-header">
+                    <h5 class="mb-0">Информация о блюде</h5>
+                </div>
+                <div class="card-body">
+                    <dl class="row">
+                        <dt class="col-sm-3">ID:</dt>
+                        <dd class="col-sm-9">@Model.Dish.Id</dd>
+
+                        <dt class="col-sm-3">Название:</dt>
+                        <dd class="col-sm-9">@Model.Dish.Name</dd>
+
+                        <dt class="col-sm-3">Описание:</dt>
+                        <dd class="col-sm-9">@Model.Dish.Description</dd>
+
+                        <dt class="col-sm-3">Калории:</dt>
+                        <dd class="col-sm-9">@Model.Dish.Calories</dd>
+
+                        <dt class="col-sm-3">Категория:</dt>
+                        <dd class="col-sm-9">@Model.Dish.Category?.Name</dd>
+
+                        @if (!string.IsNullOrEmpty(Model.Dish.Image))
+                        {
+                            <dt class="col-sm-3">Изображение:</dt>
+                            <dd class="col-sm-9">
+                                <img src="@Model.Dish.Image" alt="@Model.Dish.Name"
+                                     style="max-width: 200px; max-height: 200px;" />
+                            </dd>
+                        }
+                    </dl>
+                </div>
+            </div>
+
+            <form method="post" class="mt-4">
+                <input type="hidden" asp-for="Dish.Id" />
+                <div class="d-flex justify-content-between">
+                    <a asp-page="./Index" class="btn btn-secondary">Отмена</a>
+                    <button type="submit" class="btn btn-danger">
+                        <i class="fas fa-trash"></i> Удалить блюдо
+                    </button>
+                </div>
+            </form>
+        </div>
+    </div>
+</div>

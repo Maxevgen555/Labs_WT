@@ -1,0 +1,105 @@
+﻿@page
+@model Labs.UI.Areas.Admin.Pages.Dishes.IndexModel
+@{
+    ViewData["Title"] = "Управление блюдами";
+}
+
+<div class="container">
+    <div class="row mb-4">
+        <div class="col-md-8">
+            <h2>Управление блюдами</h2>
+        </div>
+        <div class="col-md-4 text-end">
+            <a asp-page="Create" class="btn btn-primary">
+                <i class="fas fa-plus"></i> Добавить новое блюдо
+            </a>
+        </div>
+    </div>
+
+    <!-- Фильтр по категориям -->
+    <div class="card mb-4">
+        <div class="card-header">
+            <h5 class="mb-0">Фильтр по категориям</h5>
+        </div>
+        <div class="card-body">
+            <div class="btn-group" role="group">
+                <a asp-page="./Index"
+                   class="btn @(string.IsNullOrEmpty(Model.CurrentCategory) ? "btn-primary" : "btn-outline-primary")">
+                    Все блюда
+                </a>
+                @foreach (var category in Model.Categories)
+                {
+                    <a asp-page="./Index"
+                       asp-route-category="@category.NormalizedName"
+                       class="btn @(Model.CurrentCategory == category.NormalizedName ? "btn-primary" : "btn-outline-primary")">
+                        @category.Name
+                    </a>
+                }
+            </div>
+        </div>
+    </div>
+
+    <!-- Таблица блюд -->
+    @if (Model.Dishes.Any())
+    {
+        <div class="table-responsive">
+            <table class="table table-striped table-hover">
+                <thead class="table-dark">
+                    <tr>
+                        <th>ID</th>
+                        <th>Изображение</th>
+                        <th>Название</th>
+                        <th>Описание</th>
+                        <th>Калории</th>
+                        <th>Категория</th>
+                        <th>Действия</th>
+                    </tr>
+                </thead>
+                <tbody>
+                    @foreach (var dish in Model.Dishes)
+                    {
+                        <tr>
+                            <td>@dish.Id</td>
+                            <td>
+                                @if (!string.IsNullOrEmpty(dish.Image))
+                                {
+                                    <img src="@dish.Image" alt="@dish.Name"
+                                         style="width: 80px; height: 80px; object-fit: cover;" />
+                                }
+                                else
+                                {
+                                    <span class="text-muted">Нет изображения</span>
+                                }
+                            </td>
+                            <td>@dish.Name</td>
+                            <td>@(dish.Description.Length > 50 ? dish.Description.Substring(0, 50) + "..." : dish.Description)</td>
+                            <td>@dish.Calories</td>
+                            <td>
+                                @if (dish.Category != null)
+                                {
+                                    <span class="badge bg-info">@dish.Category.Name</span>
+                                }
+                            </td>
+                            <td>
+                                <div class="btn-group" role="group">
+                                    <a asp-page="./Edit" asp-route-id="@dish.Id" class="btn btn-sm btn-warning">
+                                        <i class="fas fa-edit"></i> Изменить
+                                    </a>
+                                    <a asp-page="./Delete" asp-route-id="@dish.Id" class="btn btn-sm btn-danger">
+                                        <i class="fas fa-trash"></i> Удалить
+                                    </a>
+                                </div>
+                            </td>
+                        </tr>
+                    }
+                </tbody>
+            </table>
+        </div>
+    }
+    else
+    {
+        <div class="alert alert-info" role="alert">
+            Нет блюд для отображения. Нажмите "Добавить новое блюдо", чтобы создать первое.
+        </div>
+    }
+</div>

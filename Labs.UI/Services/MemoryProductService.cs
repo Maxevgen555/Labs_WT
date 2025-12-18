@@ -100,7 +100,10 @@ namespace Labs.UI.Services
             });
         }
 
-        public Task<ResponseData<ListModel<Dish>>> GetProductListAsync(string? categoryNormalizedName, int pageNo = 1)
+        public Task<ResponseData<ListModel<Dish>>> GetProductListAsync(
+            string? categoryNormalizedName,
+            int pageNo = 1,
+            int pageSize = 3)  // Добавляем параметр
         {
             var result = new ResponseData<ListModel<Dish>>();
 
@@ -114,13 +117,13 @@ namespace Labs.UI.Services
                 .Where(d => categoryId == null || d.CategoryId == categoryId)
                 .ToList();
 
-            // Вычисляем общее количество страниц
-            int totalPages = (int)Math.Ceiling(data.Count / (double)_pageSize);
+            // Используем pageSize вместо _pageSize
+            int totalPages = (int)Math.Ceiling(data.Count / (double)pageSize);
 
             // Применяем пагинацию
             var pagedData = data
-                .Skip((pageNo - 1) * _pageSize)
-                .Take(_pageSize)
+                .Skip((pageNo - 1) * pageSize)
+                .Take(pageSize)
                 .ToList();
 
             result.Data = new ListModel<Dish>
@@ -138,7 +141,6 @@ namespace Labs.UI.Services
 
             return Task.FromResult(result);
         }
-
         public Task UpdateProductAsync(int id, Dish product, IFormFile? formFile)
         {
             throw new NotImplementedException();

@@ -1,0 +1,84 @@
+﻿@page "{id:int}"
+@model Labs.UI.Areas.Admin.Pages.Dishes.EditModel
+@{
+    ViewData["Title"] = "Редактировать блюдо";
+}
+
+<div class="container">
+    <div class="row">
+        <div class="col-md-8 offset-md-2">
+            <h2>Редактировать блюдо</h2>
+            <hr />
+
+            @if (TempData["SuccessMessage"] != null)
+            {
+                <div class="alert alert-success">@TempData["SuccessMessage"]</div>
+            }
+
+            <form method="post" enctype="multipart/form-data">
+                <div asp-validation-summary="ModelOnly" class="text-danger"></div>
+                <input type="hidden" asp-for="Dish.Id" />
+
+                <div class="mb-3">
+                    <label asp-for="Dish.Name" class="form-label"></label>
+                    <input asp-for="Dish.Name" class="form-control" />
+                    <span asp-validation-for="Dish.Name" class="text-danger"></span>
+                </div>
+
+                <div class="mb-3">
+                    <label asp-for="Dish.Description" class="form-label"></label>
+                    <textarea asp-for="Dish.Description" class="form-control" rows="3"></textarea>
+                    <span asp-validation-for="Dish.Description" class="text-danger"></span>
+                </div>
+
+                <div class="row">
+                    <div class="col-md-6">
+                        <div class="mb-3">
+                            <label asp-for="Dish.Calories" class="form-label"></label>
+                            <input asp-for="Dish.Calories" class="form-control" type="number" min="0" />
+                            <span asp-validation-for="Dish.Calories" class="text-danger"></span>
+                        </div>
+                    </div>
+                    <div class="col-md-6">
+                        <div class="mb-3">
+                            <label asp-for="Dish.CategoryId" class="form-label"></label>
+                            <select asp-for="Dish.CategoryId" asp-items="Model.Categories" class="form-control">
+                                <option value="">-- Выберите категорию --</option>
+                            </select>
+                            <span asp-validation-for="Dish.CategoryId" class="text-danger"></span>
+                        </div>
+                    </div>
+                </div>
+
+                <div class="mb-3">
+                    <label asp-for="Dish.Image" class="form-label">URL изображения</label>
+                    <input asp-for="Dish.Image" class="form-control" />
+                    @if (!string.IsNullOrEmpty(Model.Dish.Image))
+                    {
+                        <div class="mt-2">
+                            <img src="@Model.Dish.Image" alt="Текущее изображение"
+                                 style="max-width: 200px; max-height: 200px;" />
+                        </div>
+                    }
+                </div>
+
+                <div class="mb-3">
+                    <label asp-for="ImageFile" class="form-label">Загрузить новое изображение</label>
+                    <input asp-for="ImageFile" class="form-control" type="file" accept="image/*" />
+                    <small class="form-text text-muted">Оставьте пустым, чтобы сохранить текущее изображение</small>
+                </div>
+
+                <div class="d-flex justify-content-between mt-4">
+                    <a asp-page="./Index" class="btn btn-secondary">Назад к списку</a>
+                    <button type="submit" class="btn btn-primary">Сохранить изменения</button>
+                </div>
+            </form>
+        </div>
+    </div>
+</div>
+
+@section Scripts {
+    @{
+        await Html.RenderPartialAsync("_ValidationScriptsPartial");
+    }
+}
