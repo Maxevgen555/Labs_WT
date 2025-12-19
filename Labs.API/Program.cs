@@ -1,44 +1,39 @@
 using Labs.API.Data;
 using Microsoft.EntityFrameworkCore;
-using System.Text.Json.Serialization;
 
 var builder = WebApplication.CreateBuilder(args);
 
+// 1. ВСЕ регистрации сервисов ДО Build()
 builder.Services.AddDbContext<AppDbContext>(options =>
     options.UseInMemoryDatabase("LabsDb"));
-// Add services to the container.
+
 builder.Services.AddControllers()
     .AddJsonOptions(options =>
     {
-        options.JsonSerializerOptions.ReferenceHandler = ReferenceHandler.IgnoreCycles;
-        options.JsonSerializerOptions.DefaultIgnoreCondition = JsonIgnoreCondition.WhenWritingNull;
+        options.JsonSerializerOptions.ReferenceHandler = System.Text.Json.Serialization.ReferenceHandler.IgnoreCycles;
+        options.JsonSerializerOptions.DefaultIgnoreCondition = System.Text.Json.Serialization.JsonIgnoreCondition.WhenWritingNull;
     });
 
-// Learn more about configuring Swagger/OpenAPI at https://aka.ms/aspnetcore/swashbuckle
 builder.Services.AddEndpointsApiExplorer();
 builder.Services.AddSwaggerGen();
 
-// Database configuration
-var connectionString = builder.Configuration.GetConnectionString("DefaultConnection")
-    ?? throw new InvalidOperationException("Connection string 'DefaultConnection' not found.");
-
-//builder.Services.AddDbContext<AppDbContext>(options =>
-//    options.UseSqlServer(connectionString));
-
-// CORS configuration
+// КОНФИГУРАЦИЯ CORS (КРИТИЧЕСКИ ВАЖНО для Blazor)
 builder.Services.AddCors(options =>
 {
-    options.AddPolicy("AllowAll", policy =>
-    {
-        policy.AllowAnyOrigin()
-              .AllowAnyMethod()
-              .AllowAnyHeader();
-    });
+    options.AddPolicy("AllowBlazorApp",
+        policy =>
+        {
+            // Разрешаем запросы от адреса, на котором работает ваше Blazor-приложение
+            policy.WithOrigins("https://localhost:5001", "https://localhost:7003", "http://localhost:5000")
+                  .AllowAnyMethod()
+                  .AllowAnyHeader();
+        });
 });
 
+// 2. ТОЛЬКО ПОСЛЕ ВСЕХ Add... вызываем Build()
 var app = builder.Build();
 
-// Configure the HTTP request pipeline.
+// 3. Конфигурация конвейера запросов (Middleware)
 if (app.Environment.IsDevelopment())
 {
     app.UseSwagger();
@@ -46,12 +41,14 @@ if (app.Environment.IsDevelopment())
 }
 
 app.UseHttpsRedirection();
-app.UseStaticFiles(); // Для обслуживания файлов из wwwroot / images
-app.UseCors("AllowAll");
+
+// АКТИВАЦИЯ политики CORS (должно стоять до UseAuthorization и MapControllers)
+app.UseCors("AllowBlazorApp");
+
 app.UseAuthorization();
 app.MapControllers();
 
-// Initialize database
+// Инициализация базы данных
 await DbInitializer.SeedData(app);
 
 app.Run();

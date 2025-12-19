@@ -1,0 +1,31 @@
+﻿@using Labs.Blazor.Models
+
+@if (Dish != null)
+{
+    <div class="card mt-5">
+        @if (!string.IsNullOrEmpty(Dish.Image))
+        {
+            <img src="@Dish.Image" class="card-img-top" alt="@Dish.Name" style="height: 200px; object-fit: cover;">
+        }
+        <div class="card-body">
+            <h5 class="card-title">@Dish.Name</h5>
+            <p class="card-text">@Dish.Description</p>
+            <h4>
+                <span class="badge bg-info">@Dish.Calories калорий</span>
+            </h4>
+            @if (Dish.Category != null)
+            {
+                <p class="card-text">
+                    <small class="text-muted">
+                        Категория: @Dish.Category.Name
+                    </small>
+                </p>
+            }
+        </div>
+    </div>
+}
+
+@code {
+    [Parameter]
+    public Dish? Dish { get; set; }
+}

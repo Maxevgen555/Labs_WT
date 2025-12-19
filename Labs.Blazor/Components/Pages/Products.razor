@@ -1,0 +1,35 @@
+﻿@page "/products"
+@using Labs.Blazor.Services
+@using Labs.Blazor.Models
+@using Labs.Blazor.Components.ProductComponents
+@inject IProductService<Dish> ProductService
+
+<div class="container mt-4">
+    <h2>Каталог блюд</h2>
+
+    <div class="row">
+        <div class="col-md-8">
+            <CascadingValue Value="ProductService">
+                <DishesList DishSelected="ShowDetails" />
+                <Pager />
+            </CascadingValue>
+        </div>
+        <div class="col-md-4">
+            <DishDetails Dish="SelectedDish" />
+        </div>
+    </div>
+</div>
+
+@code {
+    private Dish? SelectedDish { get; set; }
+
+    protected override async Task OnInitializedAsync()
+    {
+        await ProductService.GetProducts();
+    }
+
+    private void ShowDetails(int id)
+    {
+        SelectedDish = ProductService.Products.FirstOrDefault(d => d.Id == id);
+    }
+}
