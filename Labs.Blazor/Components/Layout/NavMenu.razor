@@ -1,0 +1,71 @@
+﻿<div class="sidebar bg-dark text-white">
+    <div class="sidebar-header p-4 text-center bg-primary">
+        <h4 class="mb-0">
+            <i class="bi bi-restaurant"></i> Ресторан
+        </h4>
+        <small class="text-light">Вкусно как дома</small>
+    </div>
+
+    <nav class="nav flex-column p-3">
+        <div class="nav-item mb-2">
+            <NavLink class="nav-link text-white d-flex align-items-center py-3 rounded-3" href="" Match="NavLinkMatch.All">
+                <i class="bi bi-house-door fs-5 me-3"></i>
+                <span>Главная</span>
+            </NavLink>
+        </div>
+
+        <div class="nav-item mb-2">
+            <NavLink class="nav-link text-white d-flex align-items-center py-3 rounded-3" href="products">
+                <i class="bi bi-menu-button-wide fs-5 me-3"></i>
+                <span>Меню</span>
+                <span class="badge bg-danger ms-auto">New</span>
+            </NavLink>
+        </div>
+
+        <div class="nav-item mb-2">
+            <a class="nav-link text-white d-flex align-items-center py-3 rounded-3" href="/testconnection">
+                <i class="bi bi-wifi fs-5 me-3"></i>
+                <span>Тест API</span>
+            </a>
+        </div>
+
+        <hr class="text-white-50 my-3">
+
+        <div class="nav-item">
+            <div class="text-muted small px-3 mb-2">ИНФОРМАЦИЯ</div>
+            <div class="px-3">
+                <small class="text-white-50">
+                    <i class="bi bi-clock-history me-1"></i>
+                    Лабораторная работа №9
+                </small>
+                <br>
+                <small class="text-white-50">
+                    <i class="bi bi-code-slash me-1"></i>
+                    Blazor + Web API
+                </small>
+            </div>
+        </div>
+    </nav>
+</div>
+
+
+    <style>
+        .sidebar {
+            min-height: 100vh;
+            width: 250px;
+        }
+
+        .nav-link {
+            transition: all 0.3s ease;
+        }
+
+            .nav-link:hover {
+                background-color: rgba(255, 255, 255, 0.1);
+                transform: translateX(5px);
+            }
+
+            .nav-link.active {
+                background-color: #0d6efd;
+                box-shadow: 0 4px 6px rgba(13, 110, 253, 0.2);
+            }
+    </style>

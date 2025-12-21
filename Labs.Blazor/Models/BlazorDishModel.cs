@@ -1,6 +1,6 @@
 ﻿namespace Labs.Blazor.Models
 {
-    public class Dish
+    public class BlazorDishModel
     {
         public int Id { get; set; }
         public string Name { get; set; } = string.Empty;
@@ -8,10 +8,10 @@
         public int Calories { get; set; }
         public string? Image { get; set; }
         public int CategoryId { get; set; }
-        public BlazorCategory? Category { get; set; }
+        public BlazorCategoryModel? Category { get; set; }
     }
 
-    public class BlazorCategory
+    public class BlazorCategoryModel
     {
         public int Id { get; set; }
         public string Name { get; set; } = string.Empty;

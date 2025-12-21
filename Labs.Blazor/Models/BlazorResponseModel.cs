@@ -1,6 +1,6 @@
 ﻿namespace Labs.Blazor.Models
 {
-    public class ResponseData<T>
+    public class BlazorResponseModel<T>
     {
         public T? Data { get; set; }
         public bool Success { get; set; } = true;

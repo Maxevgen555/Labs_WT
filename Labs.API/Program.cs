@@ -24,7 +24,12 @@ builder.Services.AddCors(options =>
         policy =>
         {
             // Разрешаем запросы от адреса, на котором работает ваше Blazor-приложение
-            policy.WithOrigins("https://localhost:5001", "https://localhost:7003", "http://localhost:5000")
+            policy.WithOrigins("https://localhost:7002",
+                               "https://localhost:7003",
+                               "http://localhost:5002",
+                               "http://localhost:5003", 
+                               "https://localhost:5001",  
+                               "http://localhost:5000")
                   .AllowAnyMethod()
                   .AllowAnyHeader();
         });
@@ -43,11 +48,15 @@ if (app.Environment.IsDevelopment())
 app.UseHttpsRedirection();
 
 // АКТИВАЦИЯ политики CORS (должно стоять до UseAuthorization и MapControllers)
-app.UseCors("AllowBlazorApp");
+app.UseCors("AllowALL");
 
 app.UseAuthorization();
 app.MapControllers();
-
+app.Use(async (context, next) =>
+{
+    Console.WriteLine($"Request: {context.Request.Method} {context.Request.Path}");
+    await next();
+});
 // Инициализация базы данных
 await DbInitializer.SeedData(app);
 

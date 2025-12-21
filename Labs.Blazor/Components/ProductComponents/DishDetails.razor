@@ -1,25 +1,44 @@
-﻿@using Labs.Blazor.Models
-
-@if (Dish != null)
+﻿@if (Dish == null)
 {
-    <div class="card mt-5">
-        @if (!string.IsNullOrEmpty(Dish.Image))
-        {
-            <img src="@Dish.Image" class="card-img-top" alt="@Dish.Name" style="height: 200px; object-fit: cover;">
-        }
-        <div class="card-body">
-            <h5 class="card-title">@Dish.Name</h5>
-            <p class="card-text">@Dish.Description</p>
-            <h4>
-                <span class="badge bg-info">@Dish.Calories калорий</span>
-            </h4>
+    <div class="text-center py-5 text-muted">
+        <i class="bi bi-arrow-left-circle display-4 mb-3"></i>
+        <h5>Выберите блюдо</h5>
+        <p>Нажмите кнопку "Подробно" рядом с любым блюдом</p>
+    </div>
+}
+else
+{
+    <div class="p-3">
+        <h5 class="fw-bold">@Dish.Name</h5>
+        <p class="text-muted">@Dish.Description</p>
+
+        <div class="mb-3">
+            <span class="badge bg-primary me-2">
+                <i class="bi bi-fire me-1"></i>@Dish.Calories ккал
+            </span>
             @if (Dish.Category != null)
             {
-                <p class="card-text">
-                    <small class="text-muted">
-                        Категория: @Dish.Category.Name
-                    </small>
-                </p>
+                <span class="badge bg-secondary">
+                    <i class="bi bi-tag me-1"></i>@Dish.Category.Name
+                </span>
+            }
+        </div>
+
+        @if (!string.IsNullOrEmpty(Dish.Image))
+        {
+            <div class="mb-3">
+                <img src="@Dish.Image"
+                     alt="@Dish.Name"
+                     class="img-fluid rounded"
+                     style="max-height: 200px; object-fit: cover">
+            </div>
+        }
+
+        <div class="small text-muted">
+            <div>ID блюда: @Dish.Id</div>
+            @if (Dish.Category != null)
+            {
+                <div>ID категории: @Dish.CategoryId</div>
             }
         </div>
     </div>
@@ -27,5 +46,5 @@
 
 @code {
     [Parameter]
-    public Dish? Dish { get; set; }
+    public BlazorDishModel? Dish { get; set; }
 }

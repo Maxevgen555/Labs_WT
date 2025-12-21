@@ -1,0 +1,109 @@
+﻿@page "/testconnection"
+@inject IHttpClientFactory HttpClientFactory
+@inject ILogger<TestConnection> Logger
+
+<PageTitle>Test Connection</PageTitle>
+
+<h3>Проверка подключения к API</h3>
+
+<button @onclick="TestDishesApi" class="btn btn-primary" disabled="@_isTesting">Проверить API Dishes</button>
+<button @onclick="TestCategoriesApi" class="btn btn-secondary ms-2" disabled="@_isTesting">Проверить API Categories</button>
+<button @onclick="TestDirect" class="btn btn-info ms-2" disabled="@_isTesting">Прямой тест</button>
+
+@if (_isTesting)
+{
+    <div class="mt-3">
+        <div class="spinner-border spinner-border-sm" role="status">
+            <span class="visually-hidden">Загрузка...</span>
+        </div>
+        Тестирование...
+    </div>
+}
+
+@if (!string.IsNullOrEmpty(result))
+{
+    <div class="mt-3 alert @(_isError ? "alert-danger" : "alert-info")">
+        <h5>Результат:</h5>
+        <pre style="white-space: pre-wrap; word-wrap: break-word;">@result</pre>
+    </div>
+}
+
+@code {
+    private string result = string.Empty;
+    private bool _isTesting = false;
+    private bool _isError = false;
+
+    private async Task TestDishesApi()
+    {
+        await TestRequest("api/dishes", "Dishes API");
+    }
+
+    private async Task TestCategoriesApi()
+    {
+        await TestRequest("api/categories", "Categories API");
+    }
+
+    private async Task TestDirect()
+    {
+        await TestRequest("", "Root (Swagger)");
+    }
+
+    private async Task TestRequest(string endpoint, string testName)
+    {
+        _isTesting = true;
+        _isError = false;
+        result = string.Empty;
+        StateHasChanged();
+
+        try
+        {
+            var httpClient = HttpClientFactory.CreateClient("General");
+            var url = $"https://localhost:7002/{endpoint}";
+
+            Logger.LogInformation($"Начинаем тест: {testName} - {url}");
+
+            using var request = new HttpRequestMessage(HttpMethod.Get, url);
+
+            var stopwatch = System.Diagnostics.Stopwatch.StartNew();
+            var response = await httpClient.SendAsync(request);
+            stopwatch.Stop();
+
+            var content = await response.Content.ReadAsStringAsync();
+
+            Logger.LogInformation($"Ответ получен: {response.StatusCode} за {stopwatch.ElapsedMilliseconds}ms");
+
+            if (response.IsSuccessStatusCode)
+            {
+                _isError = false;
+                result = $"{testName} - УСПЕХ!\n" +
+                       $"Время: {stopwatch.ElapsedMilliseconds}ms\n" +
+                       $"Статус: {response.StatusCode}\n" +
+                       $"URL: {url}\n\n" +
+                       $"Ответ:\n{content}";
+            }
+            else
+            {
+                _isError = true;
+                result = $"{testName} - ОШИБКА!\n" +
+                       $"Статус: {response.StatusCode}\n" +
+                       $"URL: {url}\n\n" +
+                       $"Содержимое ответа:\n{content}";
+            }
+        }
+        catch (Exception ex)
+        {
+            _isError = true;
+            Logger.LogError(ex, $"Ошибка: {ex.Message}");
+            result = $"{testName} - ИСКЛЮЧЕНИЕ!\n" +
+                   $"URL: https://localhost:7002/{endpoint}\n" +
+                   $"Сообщение: {ex.Message}\n" +
+                   $"Тип ошибки: {ex.GetType().Name}\n" +
+                   $"Stack Trace:\n{ex.StackTrace}";
+        }
+        finally
+        {
+            _isTesting = false;
+            StateHasChanged();
+        }
+    }
+}

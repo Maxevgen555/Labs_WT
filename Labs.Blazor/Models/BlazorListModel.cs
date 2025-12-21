@@ -1,6 +1,6 @@
 ﻿namespace Labs.Blazor.Models
 {
-    public class ListModel<T>
+    public class BlazorListModel<T>
     {
         public List<T> Items { get; set; } = new();
         public int CurrentPage { get; set; } = 1;

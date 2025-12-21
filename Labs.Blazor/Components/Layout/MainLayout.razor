@@ -1,23 +1,66 @@
 ﻿@inherits LayoutComponentBase
 
-<div class="page">
-    <div class="sidebar">
-        <NavMenu />
-    </div>
+<PageTitle>Ресторан "Вкусно"</PageTitle>
 
-    <main>
-        <div class="top-row px-4">
-            <a href="https://learn.microsoft.com/aspnet/core/" target="_blank">About</a>
+<div class="app-container">
+    <!-- Верхняя навигация вместо боковой -->
+    <header class="app-header navbar navbar-expand-lg navbar-light bg-white shadow-sm">
+        <div class="container">
+            <a class="navbar-brand fw-bold" href="/">
+                <i class="bi bi-restaurant text-primary me-2"></i>Ресторан "Вкусно"
+            </a>
+
+            <button class="navbar-toggler" type="button" data-bs-toggle="collapse" data-bs-target="#navbarNav">
+                <span class="navbar-toggler-icon"></span>
+            </button>
+
+            <div class="collapse navbar-collapse" id="navbarNav">
+                <ul class="navbar-nav ms-auto">
+                    <li class="nav-item">
+                        <NavLink class="nav-link" href="" Match="NavLinkMatch.All">
+                            <i class="bi bi-house me-1"></i>Главная
+                        </NavLink>
+                    </li>
+                    <li class="nav-item">
+                        <NavLink class="nav-link" href="products">
+                            <i class="bi bi-menu-button-wide me-1"></i>Меню
+                        </NavLink>
+                    </li>
+                </ul>
+            </div>
         </div>
+    </header>
 
-        <article class="content px-4">
-            @Body
-        </article>
+    <!-- Основной контент -->
+    <main class="app-main">
+        @Body
     </main>
 </div>
 
-<div id="blazor-error-ui" data-nosnippet>
-    An unhandled error has occurred.
-    <a href="." class="reload">Reload</a>
-    <span class="dismiss">🗙</span>
-</div>
+<style>
+    .app-container {
+        min-height: 100vh;
+        display: flex;
+        flex-direction: column;
+    }
+
+    .app-header {
+        position: sticky;
+        top: 0;
+        z-index: 1000;
+    }
+
+    .app-main {
+        flex: 1;
+        padding-top: 1rem;
+    }
+
+    .nav-link.active {
+        color: #0d6efd !important;
+        font-weight: 600;
+    }
+
+    .navbar-brand {
+        font-size: 1.5rem;
+    }
+</style>

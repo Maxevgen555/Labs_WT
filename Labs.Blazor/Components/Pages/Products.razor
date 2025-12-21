@@ -1,35 +1,100 @@
 ﻿@page "/products"
 @using Labs.Blazor.Services
 @using Labs.Blazor.Models
-@using Labs.Blazor.Components.ProductComponents
-@inject IProductService<Dish> ProductService
+@inject IProductService<BlazorDishModel> ProductService
 
-<div class="container mt-4">
-    <h2>Каталог блюд</h2>
+<PageTitle>📋 Меню</PageTitle>
 
+<div class="container py-4">
+    <!-- Заголовок -->
+    <div class="text-center mb-5">
+        <h1 class="display-4 fw-bold text-primary mb-3">
+            <i class="bi bi-menu-button-wide me-3"></i>Наше меню
+        </h1>
+        <p class="lead text-muted">
+            Выберите блюдо и нажмите "Подробно" для получения информации
+        </p>
+    </div>
+
+    <!-- Основной контент -->
     <div class="row">
-        <div class="col-md-8">
-            <CascadingValue Value="ProductService">
-                <DishesList DishSelected="ShowDetails" />
-                <Pager />
-            </CascadingValue>
+        <!-- Список блюд -->
+        <div class="col-lg-8 mb-4">
+            <div class="card shadow-sm border-0">
+                <div class="card-header bg-white border-0 py-3">
+                    <div class="d-flex justify-content-between align-items-center">
+                        <h3 class="mb-0">
+                            <i class="bi bi-list-check text-primary me-2"></i>
+                            Список блюд
+                        </h3>
+                        <span class="badge bg-primary rounded-pill px-3 py-2">
+                            @(ProductService.Products?.Count() ?? 0) блюд
+                        </span>
+                    </div>
+                </div>
+
+                <div class="card-body p-0">
+                    <CascadingValue Value="ProductService">
+                        <DishesList DishSelected="@ShowDetails" />
+                    </CascadingValue>
+                </div>
+
+                <!-- Пагинация -->
+                <div class="card-footer bg-white border-0 py-3">
+                    <Pager />
+                </div>
+            </div>
         </div>
-        <div class="col-md-4">
-            <DishDetails Dish="SelectedDish" />
+
+        <!-- Детали блюда -->
+        <div class="col-lg-4">
+            <div class="card shadow-sm border-0 h-100">
+                <div class="card-header bg-info text-white border-0 py-3">
+                    <h4 class="mb-0">
+                        <i class="bi bi-info-circle me-2"></i>
+                        Детали блюда
+                    </h4>
+                </div>
+                <div class="card-body">
+                    <DishDetails Dish="@selectedDish" />
+                </div>
+            </div>
         </div>
     </div>
 </div>
 
 @code {
-    private Dish? SelectedDish { get; set; }
+    private BlazorDishModel? selectedDish = null;
 
     protected override async Task OnInitializedAsync()
     {
-        await ProductService.GetProducts();
+        try
+        {
+            await ProductService.GetProducts();
+        }
+        catch (Exception ex)
+        {
+            Console.WriteLine($"Ошибка загрузки: {ex.Message}");
+        }
     }
 
     private void ShowDetails(int id)
     {
-        SelectedDish = ProductService.Products.FirstOrDefault(d => d.Id == id);
+        selectedDish = ProductService.Products?.FirstOrDefault(d => d.Id == id);
+        StateHasChanged();
     }
 }
+
+<style>
+    .card {
+        border-radius: 10px;
+    }
+
+    .card-header {
+        border-radius: 10px 10px 0 0 !important;
+    }
+
+    .badge {
+        font-size: 0.9rem;
+    }
+</style>

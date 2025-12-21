@@ -1,36 +1,13 @@
 ﻿@implements IDisposable
-@using Labs.Blazor.Services
-@using Labs.Blazor.Models
-
-<div class="btn-group mt-3" role="group" aria-label="Pager">
-    <!-- Кнопка Previous -->
-    <button type="button"
-            class="btn btn-outline-primary @(previousEnabled ? "" : "disabled")"
-            @onclick="@(() => OnPageSelected(ProductService.CurrentPage - 1))">
-        <span aria-hidden="true">&laquo;</span>
-    </button>
-
-    @for (int i = 1; i <= ProductService.TotalPages; i++)
-    {
-        var temp = i;
-        <button type="button"
-                class="btn btn-outline-primary @(IsActive(temp) ? "active" : "")"
-                @onclick="@(() => OnPageSelected(temp))">
-            @temp
-        </button>
-    }
-
-    <!-- Кнопка Next -->
-    <button type="button"
-            class="btn btn-outline-primary @(nextEnabled ? "" : "disabled")"
-            @onclick="@(() => OnPageSelected(ProductService.CurrentPage + 1))">
-        <span aria-hidden="true">&raquo;</span>
-    </button>
-</div>
 
 @code {
     [CascadingParameter]
-    public IProductService<Dish> ProductService { get; set; } = default!;
+    public IProductService<BlazorDishModel>? ProductService { get; set; }
+
+    private bool previousEnabled => ProductService?.CurrentPage > 1;
+    private bool nextEnabled => ProductService?.CurrentPage < ProductService?.TotalPages;
+
+    private bool IsActive(int pageNo) => pageNo == ProductService?.CurrentPage;
 
     protected override void OnInitialized()
     {
@@ -40,14 +17,12 @@
         }
     }
 
-    bool previousEnabled => ProductService.CurrentPage > 1;
-    bool nextEnabled => ProductService.CurrentPage < ProductService.TotalPages;
-
-    bool IsActive(int pageNo) => pageNo == ProductService.CurrentPage;
-
-    async void OnPageSelected(int pageNo)
+    private async Task OnPageSelected(int pageNo)
     {
-        await ProductService.GetProducts(pageNo);
+        if (ProductService != null && pageNo >= 1 && pageNo <= ProductService.TotalPages)
+        {
+            await ProductService.GetProducts(pageNo);
+        }
     }
 
     public void Dispose()
@@ -57,4 +32,33 @@
             ProductService.ListChanged -= StateHasChanged;
         }
     }
+}
+
+@if (ProductService != null && ProductService.TotalPages > 1)
+{
+    <nav>
+        <ul class="pagination">
+            <li class="page-item @(previousEnabled ? "" : "disabled")">
+                <a class="page-link" href="#" @onclick="() => OnPageSelected(ProductService.CurrentPage - 1)" @onclick:preventDefault>
+                    Назад
+                </a>
+            </li>
+
+            @for (int i = 1; i <= ProductService.TotalPages; i++)
+            {
+                var pageNumber = i;
+                <li class="page-item @(IsActive(pageNumber) ? "active" : "")">
+                    <a class="page-link" href="#" @onclick="() => OnPageSelected(pageNumber)" @onclick:preventDefault>
+                        @pageNumber
+                    </a>
+                </li>
+            }
+
+            <li class="page-item @(nextEnabled ? "" : "disabled")">
+                <a class="page-link" href="#" @onclick="() => OnPageSelected(ProductService.CurrentPage + 1)" @onclick:preventDefault>
+                    Вперед
+                </a>
+            </li>
+        </ul>
+    </nav>
 }
